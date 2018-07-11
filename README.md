@@ -55,6 +55,16 @@ status:
   state: processed <---- This will prevent processing
 ```
 
+## Command-Line Arguments
+
+The following commandline arguments are available:
+
+|    Argument    |  Purpose                                                             |
+| -------------- | -------------------------------------------------------------------- |
+| `--create-crd` | Create the `CustomResourceDefinition` at startup if it doesn't exist |
+| `--namespace`  | Watch for CRD events in a single namespace                           |
+| `--log-level=` | Set global logging level                                             |
+
 ## Helpers
 
 ### self.status
@@ -68,3 +78,8 @@ self.status = {'state': 'created', 'extraInfo': {'someMoreInfo': 'here'}}
 ### self.crd_api
 
 A pre-configured instance of `kubernetes.client.CustomObjectsApi` is available for use at `self.crd_api`
+
+
+### self.logger
+
+A logger sharing the root logger configuration is available on `self.logger`
