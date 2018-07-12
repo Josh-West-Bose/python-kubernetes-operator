@@ -3,9 +3,9 @@ import kubernetes.client
 import logging
 import urllib
 
-from op.states import (KUBERNETES_EVENT_ADDED,
-                       KUBERNETES_EVENT_MODIFIED,
-                       KUBERNETES_EVENT_DELETED)
+from pykubeop.states import (KUBERNETES_EVENT_ADDED,
+                             KUBERNETES_EVENT_MODIFIED,
+                             KUBERNETES_EVENT_DELETED)
 
 
 class CRDMeta(type):

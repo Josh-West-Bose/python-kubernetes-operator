@@ -1,4 +1,4 @@
-from op.operator import IAMRole
-from op.states import *
+from pykubeop.operator import IAMRole
+from pykubeop.states import *
 
 __all__ = ['KubernetesMOperator', 'CRDBase']
