@@ -3,6 +3,7 @@ import kubernetes.client
 import logging
 import urllib
 
+from pykubeop.errors import InvalidSpecException
 from pykubeop.states import (KUBERNETES_EVENT_ADDED,
                              KUBERNETES_EVENT_MODIFIED,
                              KUBERNETES_EVENT_DELETED)
@@ -25,8 +26,11 @@ class CRDBase(object, metaclass=CRDMeta):
 
     def __init__(self, cr, crd_api=None, **kwargs):
         self.__cr = cr
-        self.metadata = cr['metadata']
-        self.spec = cr['spec']
+        try:
+            self.metadata = cr['metadata']
+            self.spec = cr['spec']
+        except KeyError as e:
+            raise InvalidSpecException("missing '{}' key in spec".format(e.args[0]))
         if crd_api:
             self.__customObjectsApi = crd_api
         else:
