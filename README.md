@@ -38,7 +38,7 @@ if __name__ == '__main__':
 
 ## State
 
-The operator logic will only process `ADDED` events when a `CustomObject` _doesn't_ have `status.created` set, e.g.:
+The operator logic will only process `ADDED` events when a `CustomObject` _doesn't_ have `status.state` set, e.g.:
 
 Will get processed:
 
