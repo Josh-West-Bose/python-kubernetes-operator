@@ -60,6 +60,11 @@ class KubernetesOperator(object):
             api_client=self.api_client
         )
 
+    def get_crd_object(self, obj):
+        return self.crd(
+            obj, self.crd_client, logger=self.logger, args=self.args
+        )
+
     def run(self):
         self.logger.info("Starting Kubernetes Operator")
         if self.args.create_crd:
@@ -91,9 +96,7 @@ class KubernetesOperator(object):
                     )
 
                 for event in stream:
-                    instance = self.crd(
-                        event['object'], self.crd_client, logger=self.logger, args=self.args
-                    )
+                    instance = self.get_crd_object(event['object'])
                     instance.ensure(event['type'])
 
             except KeyboardInterrupt:
