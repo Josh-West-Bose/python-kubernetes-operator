@@ -1,6 +1,6 @@
 # Python Kubernetes Operator
 
-This package is a quick way to get a working Kubernetes Operator. See bellow for an example:
+This package is a quick way to get a working Kubernetes Operator. See below for an example:
 
 ```
 from pykubeop import KubernetesOperator, CRDBase
