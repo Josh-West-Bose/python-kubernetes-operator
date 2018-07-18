@@ -5,7 +5,7 @@ This package is a quick way to get a working Kubernetes Operator. See bellow for
 ```
 from pykubeop import KubernetesOperator, CRDBase
 
-class MyOperator(CRDBase):
+class MyCustomResource(CRDBase):
     GROUP = 'example.clearscore.io'
     VERSION = 'v1alpha1'
     SINGULAR = `testobject`
@@ -14,6 +14,7 @@ class MyOperator(CRDBase):
 
     def ensure_created(self):
         // Do some custom logic for ADDED events here
+        print(self.args.my_argument)
 
     def ensure_modified(self):
         // Do some custom logic for MODIFIED events here
@@ -22,8 +23,17 @@ class MyOperator(CRDBase):
         // Do some custom logic for DELETE events here
 
 
+class MyOperator(KubernetesOperator):
+    def add_arguments(self, parser):
+        parser.add_argument(
+            '--my-argument',
+            type='str',
+            help='My useful arg'
+        )
+
+
 if __name__ == '__main__':
-    KubernetesOperator(MyCustomResource).run()
+    MyOperator(MyCustomResource).run()
 ```
 
 ## State
@@ -67,7 +77,7 @@ The following commandline arguments are available:
 
 ## Helpers
 
-### self.status
+### CRDBase.status
 
 the `CRDBase` object has a helper property called `status`. When written to it will updated the `status` field of the CustomObject. This allows for easy updating of the status as you process events. Example:
 
@@ -75,11 +85,15 @@ the `CRDBase` object has a helper property called `status`. When written to it w
 self.status = {'state': 'created', 'extraInfo': {'someMoreInfo': 'here'}}
 ```
 
-### self.crd_api
+### CRDBase.crd_api
 
 A pre-configured instance of `kubernetes.client.CustomObjectsApi` is available for use at `self.crd_api`
 
 
-### self.logger
+### CRDBase.logger
 
 A logger sharing the root logger configuration is available on `self.logger`
+
+### CRDBase.args
+
+Commandline arguments via `argparse` are all available within the CRD resource
