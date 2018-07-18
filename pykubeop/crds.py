@@ -34,6 +34,7 @@ class CRDBase(object, metaclass=CRDMeta):
                 kubernetes.client.ApiClient(configuration=kubernetes.client.Configuration())
             )
         self.logger = logging.getLogger(__name__)
+        self.args = kwargs.get('args')
 
     @property
     def status(self):
@@ -102,7 +103,7 @@ class CRDBase(object, metaclass=CRDMeta):
             return None
 
     @classmethod
-    def create_custom_resource_definiton(cls, api_client):
+    def create_custom_resource_definition(cls, api_client):
         ext_client = kubernetes.client.ApiextensionsV1beta1Api(api_client=api_client)
         # Hacky workaround for
         # https://github.com/kubernetes/kubernetes/pull/64996 and

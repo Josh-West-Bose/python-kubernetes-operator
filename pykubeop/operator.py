@@ -36,10 +36,14 @@ class KubernetesOperator(object):
             default="INFO",
             choices=["DEBUG", "INFO", "WARNING", "ERROR"]
         )
+        self.add_arguments(parser)
         self.args = parser.parse_args()
         logging.basicConfig(level=getattr(logging, self.args.log_level))
         self.logger = logging.getLogger("KubernetesOperator")
         self.setup_apis()
+
+    def add_arguments(self, parser):
+        pass
 
     def setup_apis(self):
         if self.args.external:
@@ -88,7 +92,7 @@ class KubernetesOperator(object):
 
                 for event in stream:
                     instance = self.crd(
-                        event['object'], self.crd_client, logger=self.logger
+                        event['object'], self.crd_client, logger=self.logger, args=self.args
                     )
                     instance.ensure(event['type'])
 
