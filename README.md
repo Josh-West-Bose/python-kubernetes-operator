@@ -1,6 +1,6 @@
 # Python Kubernetes Operator
 
-This package is a quick way to get a working Kubernetes Operator. See bellow for an example:
+This package is a quick way to get a working Kubernetes Operator. See below for an example:
 
 ```
 from pykubeop import KubernetesOperator, CRDBase
@@ -38,7 +38,7 @@ if __name__ == '__main__':
 
 ## State
 
-The operator logic will only process `ADDED` events when a `CustomObject` _doesn't_ have `status.created` set, e.g.:
+The operator logic will only process `ADDED` events when a `CustomObject` _doesn't_ have `status.state` set, e.g.:
 
 Will get processed:
 
