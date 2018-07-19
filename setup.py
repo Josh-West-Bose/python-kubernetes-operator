@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(name="python-kubernetes-operator",
-      version="0.1",
+      version="0.1.1",
       description="Simple Framework for Making Kubernetes Operators",
       url="https://github.com/ClearScore/python-kubernetes-operator",
       author="David Dyball",

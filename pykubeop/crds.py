@@ -32,13 +32,56 @@ class CRDBase(object, metaclass=CRDMeta):
         except KeyError as e:
             raise InvalidSpecException("missing '{}' key in spec".format(e.args[0]))
         if crd_api:
+            self.api_client = crd_api.api_client
             self.__customObjectsApi = crd_api
         else:
-            self.__customObjectsApi = kubernetes.client.CustomObjectsApi(
-                kubernetes.client.ApiClient(configuration=kubernetes.client.Configuration())
+            self.api_client = kubernetes.client.ApiClient(
+                configuration=kubernetes.client.Configuration()
             )
+            self.__customObjectsApi = kubernetes.client.CustomObjectsApi(self.api_client)
         self.logger = logging.getLogger(__name__)
         self.args = kwargs.get('args')
+
+    def __patch(self, patch):
+        self.__customObjectsApi.patch_namespaced_custom_object(
+            self.GROUP,
+            self.VERSION,
+            self.metadata['namespace'],
+            self.PLURAL,
+            self.metadata['name'],
+            patch
+        )
+
+    @property
+    def finalizers(self):
+        resource = self.__customObjectsApi.get_namespaced_custom_object(
+            self.GROUP,
+            self.VERSION,
+            self.metadata['namespace'],
+            self.PLURAL,
+            self.metadata['name']
+        )
+        try:
+            return resource.metadata['finalizers']
+        except KeyError:
+            return []
+
+    @finalizers.setter
+    def finalizer(self, value):
+        self.__patch({'metadata': {'finalizers': value}})
+        self.__cr['metadata']['finalizers'] = value
+
+    def add_finalizer(self, finalizer):
+        current_finalizers = self.finalizers
+        if finalizer not in current_finalizers:
+            list.append(finalizer)
+            self.finalizers = current_finalizers
+
+    def pop_finalizer(self, finalizer):
+        current_finalizers = self.finalizers
+        if finalizer in current_finalizers:
+            current_finalizers.pop(finalizer)
+            self.finalizers = current_finalizers
 
     @property
     def status(self):
@@ -51,14 +94,7 @@ class CRDBase(object, metaclass=CRDMeta):
     def status(self, value):
         if 'status' not in value:
             value = {'status': value}
-        resource = self.__customObjectsApi.patch_namespaced_custom_object(
-            self.GROUP,
-            self.VERSION,
-            self.metadata['namespace'],
-            self.PLURAL,
-            self.metadata['name'],
-            value
-        )
+        resource = self.__patch(value)
         self.__cr['status'] = resource['status']
 
     @classmethod
