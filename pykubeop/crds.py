@@ -89,7 +89,7 @@ class CRDBase(object, metaclass=CRDMeta):
             return self.__cr['status']
         except KeyError:
             return {}
-    
+
     @status.setter
     def status(self, value):
         if 'status' not in value:
@@ -101,7 +101,7 @@ class CRDBase(object, metaclass=CRDMeta):
     def get_watch_stream(cls, crd_api, namespace=None):
         if namespace:
             return kubernetes.watch.Watch().stream(
-                crd_api.list_cluster_custom_object,
+                crd_api.list_namespaced_custom_object,
                 group=cls.GROUP,
                 version=cls.VERSION,
                 namespace=namespace,
@@ -116,7 +116,7 @@ class CRDBase(object, metaclass=CRDMeta):
                 plural=cls.PLURAL,
                 resource_version=cls.RESOURCE_VERSION
             )
-    
+
     @classmethod
     def get_custom_resource(cls, api, name, namespace):
         try:
