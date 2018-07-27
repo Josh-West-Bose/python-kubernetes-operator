@@ -43,7 +43,7 @@ class CRDBase(object, metaclass=CRDMeta):
         self.args = kwargs.get('args')
 
     def __patch(self, patch):
-        self.__customObjectsApi.patch_namespaced_custom_object(
+        return self.__customObjectsApi.patch_namespaced_custom_object(
             self.GROUP,
             self.VERSION,
             self.metadata['namespace'],
