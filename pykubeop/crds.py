@@ -183,9 +183,8 @@ class CRDBase(object, metaclass=CRDMeta):
 
     def ensure(self, action):
         self.logger.debug("Kubernetes CRD Action: %s", action)
-        if 'state' in self.status and self.status['state'] == 'error':
-            self.logger.warn("CustomResource State: %s", self.status.get('state', ''))
-            self.logger.warn("Error: %s", self.status['error'])
+        if 'state' in self.status and 'error' in self.status and self.status['state'] == 'error':
+            self.logger.warn("CustomResource State: %s", self.status)
         self.logger.debug("CustomResource State: %s", self.status.get('state', ''))
         if action == KUBERNETES_EVENT_ADDED and 'state' not in self.status:
             try:
