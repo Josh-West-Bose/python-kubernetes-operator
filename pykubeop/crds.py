@@ -25,7 +25,10 @@ class CRDBase(object, metaclass=CRDMeta):
     SCOPE = "Namespaced"
 
     def __init__(self, cr, crd_api=None, **kwargs):
+        self.logger = logging.getLogger(__name__)
         self.__cr = cr
+        self.logger.debug("Instantiated CRD %s with client %s", cr, crd_api)
+        self.logger.debug("kwargs: %s", kwargs)
         try:
             self.metadata = cr['metadata']
             self.spec = cr['spec']
@@ -39,7 +42,6 @@ class CRDBase(object, metaclass=CRDMeta):
                 configuration=kubernetes.client.Configuration()
             )
             self.__customObjectsApi = kubernetes.client.CustomObjectsApi(self.api_client)
-        self.logger = logging.getLogger(__name__)
         self.args = kwargs.get('args')
 
     def __patch(self, patch):
