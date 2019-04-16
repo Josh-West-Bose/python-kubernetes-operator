@@ -45,44 +45,61 @@ class CRDBase(object, metaclass=CRDMeta):
         self.args = kwargs.get('args')
 
     def __patch(self, patch):
-        return self.__customObjectsApi.patch_namespaced_custom_object(
-            self.GROUP,
-            self.VERSION,
-            self.metadata['namespace'],
-            self.PLURAL,
-            self.metadata['name'],
-            patch
-        )
+        if self.SCOPE == 'Namespaced':
+            return self.__customObjectsApi.patch_namespaced_custom_object(
+                self.GROUP,
+                self.VERSION,
+                self.metadata['namespace'],
+                self.PLURAL,
+                self.metadata['name'],
+                patch
+            )
+        else:
+            return self.__customObjectsApi.patch_cluster_custom_object(
+                self.GROUP,
+                self.VERSION,
+                self.PLURAL,
+                self.metadata['name'],
+                patch
+            )
 
     @property
     def finalizers(self):
-        resource = self.__customObjectsApi.get_namespaced_custom_object(
-            self.GROUP,
-            self.VERSION,
-            self.metadata['namespace'],
-            self.PLURAL,
-            self.metadata['name']
-        )
+        if self.SCOPE == 'Namespaced':
+            resource = self.__customObjectsApi.get_namespaced_custom_object(
+                self.GROUP,
+                self.VERSION,
+                self.metadata['namespace'],
+                self.PLURAL,
+                self.metadata['name']
+            )
+        else:
+            resource = self.__customObjectsApi.get_cluster_custom_object(
+                self.GROUP,
+                self.VERSION,
+                self.PLURAL,
+                self.metadata['name']
+            )
         try:
-            return resource.metadata['finalizers']
+            return resource['metadata']['finalizers']
         except KeyError:
             return []
 
     @finalizers.setter
-    def finalizer(self, value):
+    def finalizers(self, value):
         self.__patch({'metadata': {'finalizers': value}})
         self.__cr['metadata']['finalizers'] = value
 
     def add_finalizer(self, finalizer):
         current_finalizers = self.finalizers
         if finalizer not in current_finalizers:
-            list.append(finalizer)
+            current_finalizers.append(finalizer)
             self.finalizers = current_finalizers
 
-    def pop_finalizer(self, finalizer):
+    def remove_finalizer(self, finalizer):
         current_finalizers = self.finalizers
         if finalizer in current_finalizers:
-            current_finalizers.pop(finalizer)
+            current_finalizers.remove(finalizer)
             self.finalizers = current_finalizers
 
     @property
@@ -107,16 +124,14 @@ class CRDBase(object, metaclass=CRDMeta):
                 group=cls.GROUP,
                 version=cls.VERSION,
                 namespace=namespace,
-                plural=cls.PLURAL,
-                resource_version=cls.RESOURCE_VERSION
+                plural=cls.PLURAL
             )
         else:
             return kubernetes.watch.Watch().stream(
                 crd_api.list_cluster_custom_object,
                 group=cls.GROUP,
                 version=cls.VERSION,
-                plural=cls.PLURAL,
-                resource_version=cls.RESOURCE_VERSION
+                plural=cls.PLURAL
             )
 
     @classmethod
